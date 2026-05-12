@@ -7,10 +7,9 @@ void inp_f_g(f_g& lst, std::istream& in) {
     lst.L = 0;
 
     while (true) {
-        while (in.peek() == ' ' || in.peek() == '\t') {
-            char c;
-            in.get(c);
-        }
+        // пропускаем пробелы и табул€ции
+        while (in.peek() == ' ' || in.peek() == '\t')
+            in.get();
 
         int p = in.peek();
         if (p == '\n' || p == '\r' || p == EOF) {
@@ -30,6 +29,15 @@ void inp_f_g(f_g& lst, std::istream& in) {
         lst.t = node;
         lst.L++;
     }
+
+    // ≈сли строка пуста€, добавл€ем один пустой блок (дл€ единообрази€)
+    if (lst.L == 0) {
+        el_g* dummy = new el_g;
+        dummy->T.A[0] = '\0';
+        dummy->next = nullptr;
+        lst.h = lst.t = dummy;
+        lst.L = 1;
+    }
 }
 
 void out_f_g(const f_g& lst, std::ostream& out) {
@@ -37,7 +45,6 @@ void out_f_g(const f_g& lst, std::ostream& out) {
         out << "[]";
         return;
     }
-
     out << "[";
     el_g* cur = lst.h;
     bool first = true;
@@ -56,38 +63,56 @@ void free_f_g(f_g& lst) {
     lst.L = 0;
 }
 
+// —равнение двух строк (f_g) лексикографически, символ за символом
 int cmp_f_g(const f_g& a, const f_g& b) {
     el_g* pa = a.h;
     el_g* pb = b.h;
+    int ia = 0, ib = 0;
 
     while (pa && pb) {
-        int c = cmp_str(pa->T, pb->T);
-        if (c != 0) return c;
-        pa = pa->next;
-        pb = pb->next;
+        char ca = pa->T.A[ia];
+        char cb = pb->T.A[ib];
+
+        if (ca != cb)
+            return (unsigned char)ca - (unsigned char)cb;
+
+        if (ca == '\0') break; // обе строки закончились
+
+        ia++; ib++;
+
+        // переход к следующему блоку, если текущий исчерпан
+        if (ia >= N - 1 || pa->T.A[ia] == '\0') { // или просто до '\0'
+            pa = pa->next;
+            ia = 0;
+        }
+        if (ib >= N - 1 || pb->T.A[ib] == '\0') {
+            pb = pb->next;
+            ib = 0;
+        }
     }
 
-    // ≈сли один список длиннее другого
-    if (pa && !(pa->T.A[0] == '\0' && pa->next == nullptr)) return 1;
-    if (pb && !(pb->T.A[0] == '\0' && pb->next == nullptr)) return -1;
+    // если один список ещЄ не закончилс€, а другой закончилс€
+    if (pa && !(pa->T.A[ia] == '\0' && pa->next == nullptr && ia == 0))
+        return 1;
+    if (pb && !(pb->T.A[ib] == '\0' && pb->next == nullptr && ib == 0))
+        return -1;
     return 0;
 }
 
 void copy_f_g(f_g& dest, const f_g& src) {
     free_f_g(dest);
-
     if (!src.h) return;
 
-    el_g* p = src.h;
+    el_g* cur = src.h;
     el_g** tail = &dest.h;
 
-    while (p) {
+    while (cur) {
         el_g* node = new el_g;
-        node->T = p->T;
+        node->T = cur->T;   // структурное копирование
         node->next = nullptr;
         *tail = node;
         tail = &node->next;
-        p = p->next;
+        cur = cur->next;
         dest.L++;
     }
     dest.t = (dest.h ? *tail : nullptr);

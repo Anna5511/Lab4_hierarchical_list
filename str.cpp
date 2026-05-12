@@ -1,5 +1,5 @@
 #include "defstr.h"
-#include <cstring>
+#include <cstring>   // <-- важно
 
 void inp_str(str& s, std::istream& in) {
     int i = 0;
@@ -13,7 +13,7 @@ void inp_str(str& s, std::istream& in) {
 }
 
 void out_str(const str& s, std::ostream& out) {
-    for (int i = 0; i < N && s.A[i] != '\0'; i++) {
+    for (int i = 0; i < N && s.A[i] != '\0'; ++i) {
         out << s.A[i];
     }
 }

@@ -27,9 +27,6 @@
     <ClInclude Include="defel_g.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="f_g.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="deff_g.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -52,6 +49,9 @@
     </ClCompile>
     <ClCompile Include="el_g.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="f_g.h">
+      <Filter>Файлы заголовков</Filter>
     </ClCompile>
     <ClCompile Include="f_g.cpp">
       <Filter>Исходные файлы</Filter>

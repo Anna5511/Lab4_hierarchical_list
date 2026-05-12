@@ -5,9 +5,10 @@
 #include <iostream>
 #include <fstream>
 
+void init_f_v(f_v& lst);
 void inp_f_v(f_v& lst, const char* filename);
 void out_f_v(const f_v& lst, std::ostream& out);
 void free_f_v(f_v& lst);
-void symmetric_difference(f_v& l3, const f_v& l1, const f_v& l2);
+void symmetric_difference(f_v& result, const f_v& l1, const f_v& l2);
 
 #endif

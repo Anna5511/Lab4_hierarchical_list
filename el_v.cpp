@@ -9,6 +9,10 @@ void inp_el_v(el_v*& node, std::istream& in) {
     inp_f_g(node->f, in);
 }
 
+void out_el_v(const el_v* node, std::ostream& out) {
+    if (node) out_f_g(node->f, out);
+}
+
 void free_el_v(el_v*& head) {
     while (head) {
         el_v* tmp = head;
