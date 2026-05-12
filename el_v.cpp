@@ -1,16 +1,18 @@
 #include "defel_v.h"
-#include "deff_g.h"
 
 void inp_el_v(el_v*& node, std::istream& in) {
     node = new el_v;
-    node->f.h = node->f.t = nullptr;
-    node->f.L = 0;
     node->next = nullptr;
+    init_f_g(node->f);
     inp_f_g(node->f, in);
 }
 
 void out_el_v(const el_v* node, std::ostream& out) {
     if (node) out_f_g(node->f, out);
+}
+
+void process_el_v(el_v* node) {
+    if (node) process_f_g(node->f);
 }
 
 void free_el_v(el_v*& head) {

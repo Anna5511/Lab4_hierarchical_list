@@ -4,7 +4,7 @@
 #include "el_g.h"
 
 struct f_g {
-    unsigned L;      // количество блоков (el_g)
+    unsigned L;
     el_g* h;
     el_g* t;
 };

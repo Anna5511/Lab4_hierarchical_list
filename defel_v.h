@@ -2,10 +2,11 @@
 #define DEFEL_V_H
 
 #include "el_v.h"
-#include <iostream>
+#include "deff_g.h"
 
 void inp_el_v(el_v*& node, std::istream& in);
 void out_el_v(const el_v* node, std::ostream& out);
+void process_el_v(el_v* node);
 void free_el_v(el_v*& head);
 
 #endif

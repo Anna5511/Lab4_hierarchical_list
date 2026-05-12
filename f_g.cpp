@@ -1,119 +1,124 @@
 #include "deff_g.h"
-#include "defel_g.h"
-#include "defstr.h"
+#include <cstring>
 
-void inp_f_g(f_g& lst, std::istream& in) {
+void init_f_g(f_g& lst) {
     lst.h = lst.t = nullptr;
     lst.L = 0;
+}
 
-    while (true) {
-        // пропускаем пробелы и табул€ции
-        while (in.peek() == ' ' || in.peek() == '\t')
-            in.get();
+void inp_f_g(f_g& lst, std::istream& in) {
+    init_f_g(lst);
+    // ѕропускаем возможные пустые строки в начале
+    while (in.peek() == '\n' || in.peek() == '\r')
+        in.get();
+    if (in.eof()) return;
 
-        int p = in.peek();
-        if (p == '\n' || p == '\r' || p == EOF) {
-            if (p != EOF) {
-                char c;
-                in.get(c);
-                if (c == '\r' && in.peek() == '\n') in.get(c);
-            }
-            break;
-        }
-
-        el_g* node = nullptr;
-        inp_el_g(node, in);
-
+    bool end_of_line = false;
+    while (!end_of_line && !in.eof()) {
+        el_g* node = new el_g;
+        node->next = nullptr;
+        inp_str(node->T, in);
         if (!lst.h) lst.h = node;
         else lst.t->next = node;
         lst.t = node;
         lst.L++;
+
+        // ѕровер€ем, что после блока идЄт конец строки
+        if (in.eof()) break;
+        if (in.peek() == '\n') {
+            in.get();
+            end_of_line = true;
+        }
+        else if (in.peek() == '\r') {
+            in.get();
+            if (in.peek() == '\n') in.get();
+            end_of_line = true;
+        }
+        // »наче строка продолжаетс€ (следующий блок)
     }
 
-    // ≈сли строка пуста€, добавл€ем один пустой блок (дл€ единообрази€)
+    // ≈сли строка была пустой (не добавлено ни одного блока)
     if (lst.L == 0) {
-        el_g* dummy = new el_g;
-        dummy->T.A[0] = '\0';
-        dummy->next = nullptr;
-        lst.h = lst.t = dummy;
+        el_g* n = new el_g;
+        n->next = nullptr;
+        n->T.A[0] = '\0';
+        lst.h = lst.t = n;
         lst.L = 1;
     }
 }
 
 void out_f_g(const f_g& lst, std::ostream& out) {
-    if (!lst.h) {
-        out << "[]";
+    if (lst.L == 1 && lst.h && lst.h->T.A[0] == '\0') {
+        out << "[empty]";
         return;
     }
-    out << "[";
-    el_g* cur = lst.h;
-    bool first = true;
-    while (cur) {
-        if (!first) out << ", ";
-        out_el_g(cur, out);
-        first = false;
-        cur = cur->next;
+    el_g* p = lst.h;
+    while (p) {
+        out_el_g(p, out);
+        out << "->";
+        p = p->next;
     }
-    out << "]";
+    out << "NULL";
+}
+
+void process_f_g(f_g& lst) {
+    el_g* p = lst.h;
+    while (p) {
+        process_el_g(p);
+        p = p->next;
+    }
 }
 
 void free_f_g(f_g& lst) {
     free_el_g(lst.h);
-    lst.h = lst.t = nullptr;
-    lst.L = 0;
-}
-
-// —равнение двух строк (f_g) лексикографически, символ за символом
-int cmp_f_g(const f_g& a, const f_g& b) {
-    el_g* pa = a.h;
-    el_g* pb = b.h;
-    int ia = 0, ib = 0;
-
-    while (pa && pb) {
-        char ca = pa->T.A[ia];
-        char cb = pb->T.A[ib];
-
-        if (ca != cb)
-            return (unsigned char)ca - (unsigned char)cb;
-
-        if (ca == '\0') break; // обе строки закончились
-
-        ia++; ib++;
-
-        // переход к следующему блоку, если текущий исчерпан
-        if (ia >= N - 1 || pa->T.A[ia] == '\0') { // или просто до '\0'
-            pa = pa->next;
-            ia = 0;
-        }
-        if (ib >= N - 1 || pb->T.A[ib] == '\0') {
-            pb = pb->next;
-            ib = 0;
-        }
-    }
-
-    // если один список ещЄ не закончилс€, а другой закончилс€
-    if (pa && !(pa->T.A[ia] == '\0' && pa->next == nullptr && ia == 0))
-        return 1;
-    if (pb && !(pb->T.A[ib] == '\0' && pb->next == nullptr && ib == 0))
-        return -1;
-    return 0;
+    init_f_g(lst);
 }
 
 void copy_f_g(f_g& dest, const f_g& src) {
-    free_f_g(dest);
-    if (!src.h) return;
-
+    init_f_g(dest);
     el_g* cur = src.h;
-    el_g** tail = &dest.h;
-
     while (cur) {
         el_g* node = new el_g;
-        node->T = cur->T;   // структурное копирование
         node->next = nullptr;
-        *tail = node;
-        tail = &node->next;
-        cur = cur->next;
+        std::memcpy(node->T.A, cur->T.A, N);
+        if (!dest.h) dest.h = node;
+        else dest.t->next = node;
+        dest.t = node;
         dest.L++;
+        cur = cur->next;
     }
-    dest.t = (dest.h ? *tail : nullptr);
+}
+
+bool fg_equal(const f_g& a, const f_g& b) {
+    return fg_compare(a, b) == 0;
+}
+
+int fg_compare(const f_g& a, const f_g& b) {
+    el_g* pa = a.h;
+    el_g* pb = b.h;
+    int pos_a = 0, pos_b = 0;
+    while (pa && pb) {
+        // —равниваем символы текущих блоков
+        while (pos_a < N && pa->T.A[pos_a] != '\0' &&
+            pos_b < N && pb->T.A[pos_b] != '\0' &&
+            pa->T.A[pos_a] == pb->T.A[pos_b]) {
+            pos_a++; pos_b++;
+        }
+        if (pos_a == N || pa->T.A[pos_a] == '\0' ||
+            pos_b == N || pb->T.A[pos_b] == '\0' ||
+            pa->T.A[pos_a] != pb->T.A[pos_b]) {
+            unsigned char ca = (pos_a < N && pa->T.A[pos_a] != '\0') ? (unsigned char)pa->T.A[pos_a] : 0;
+            unsigned char cb = (pos_b < N && pb->T.A[pos_b] != '\0') ? (unsigned char)pb->T.A[pos_b] : 0;
+            if (ca != cb) return (ca < cb) ? -1 : 1;
+            // ≈сли один блок закончилс€, двигаемс€ дальше
+            if (pa->T.A[pos_a] == '\0') { pa = pa->next; pos_a = 0; }
+            if (pb->T.A[pos_b] == '\0') { pb = pb->next; pos_b = 0; }
+            continue;
+        }
+        // ≈сли один из блоков закончилс€, переходим к следующему
+        if (pa->T.A[pos_a] == '\0') { pa = pa->next; pos_a = 0; }
+        if (pb->T.A[pos_b] == '\0') { pb = pb->next; pos_b = 0; }
+    }
+    if (pa == nullptr && pb == nullptr) return 0;
+    return (pa == nullptr) ? -1 : 1;
 }

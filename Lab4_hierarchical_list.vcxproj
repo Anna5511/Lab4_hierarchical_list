@@ -26,6 +26,7 @@
     <ClInclude Include="defstr.h" />
     <ClInclude Include="el_g.h" />
     <ClInclude Include="el_v.h" />
+    <ClInclude Include="f_g.h" />
     <ClInclude Include="f_v.h" />
     <ClInclude Include="str.h" />
   </ItemGroup>
@@ -33,7 +34,6 @@
     <ClCompile Include="el_g.cpp" />
     <ClCompile Include="el_v.cpp" />
     <ClCompile Include="f_g.cpp" />
-    <ClCompile Include="f_g.h" />
     <ClCompile Include="f_v.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="str.cpp" />

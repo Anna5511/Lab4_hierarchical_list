@@ -1,46 +1,34 @@
-п»ї#include "deff_v.h"
-#include <iostream>
+#include "deff_v.h"
 #include <fstream>
-#include <locale>
-
-using namespace std;
+#include <iostream>
 
 int main() {
     setlocale(LC_ALL, "ru");
 
-    // РСЃРїРѕР»СЊР·СѓРµРј РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Рµ РїСѓС‚Рё (С„Р°Р№Р»С‹ РґРѕР»Р¶РЅС‹ Р»РµР¶Р°С‚СЊ РІ РїР°РїРєРµ СЃ РїСЂРѕРіСЂР°РјРјРѕР№)
-    const char* in1f = "C:\\Users\\РђРЅРµС‡РєР°\\Documents\\4\\in1.txt";
-    const char* in2f = "C:\\Users\\РђРЅРµС‡РєР°\\Documents\\4\\in2.txt";
-    const char* outf = "C:\\Users\\РђРЅРµС‡РєР°\\Documents\\4\\out.txt";
-
     f_v l1, l2, l3;
-    init_f_v(l1);
-    init_f_v(l2);
-    init_f_v(l3);
+    inp_f_v(l1, "C:\\Users\\Анечка\\Documents\\4\\in1.txt");
+    inp_f_v(l2, "C:\\Users\\Анечка\\Documents\\4\\in2.txt");
 
-    inp_f_v(l1, in1f);
-    inp_f_v(l2, in2f);
+    symmetric_difference_f_v(l1, l2, l3);
 
-    symmetric_difference(l3, l1, l2);
-
-    ofstream fout(outf);
-    if (fout.is_open()) {
-        fout << "l1 = R(S1):\n";
-        out_f_v(l1, fout);
-        fout << "\nl2 = R(S2):\n";
-        out_f_v(l2, fout);
-        fout << "\nl3 = R(S3):\n";
-        out_f_v(l3, fout);
-        fout.close();
-        cout << "Р РµР·СѓР»СЊС‚Р°С‚ Р·Р°РїРёСЃР°РЅ РІ " << outf << endl;
+    std::ofstream fout("C:\\Users\\Анечка\\Documents\\4\\out.txt");
+    if (!fout) {
+        std::cerr << "Ошибка открытия входного файла\n";
+        free_f_v(l1);
+        free_f_v(l2);
+        free_f_v(l3);
+        return 1;
     }
-    else {
-        cerr << "РћС€РёР±РєР°: РЅРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ output.txt" << endl;
-    }
+
+    fout << "Исходный список 1 (S1):\n";
+    out_f_v(l1, fout);
+    fout << "\nИсходный список 2 (S2):\n";
+    out_f_v(l2, fout);
+    fout << "\nСимметрическая разность S3:\n";
+    out_f_v(l3, fout);
 
     free_f_v(l1);
     free_f_v(l2);
     free_f_v(l3);
-
     return 0;
 }
