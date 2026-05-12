@@ -3,7 +3,7 @@
 void inp_str(str& s, std::istream& in) {
     int i = 0;
     char c;
-    while (i < N - 1 && in.peek() != EOF && in.peek() != '\n' && in.peek() != '\r') {
+    while (i < N && in.peek() != EOF && in.peek() != '\n' && in.peek() != '\r') {
         in.get(c);
         s.A[i++] = c;
     }

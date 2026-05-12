@@ -4,7 +4,7 @@
 const int N = 50;
 
 struct str {
-    char A[N];
+    char A[N+1];
 };
 
 #endif

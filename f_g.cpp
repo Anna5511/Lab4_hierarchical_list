@@ -80,7 +80,7 @@ void copy_f_g(f_g& dest, const f_g& src) {
     while (cur) {
         el_g* node = new el_g;
         node->next = nullptr;
-        std::memcpy(node->T.A, cur->T.A, N);
+        std::memcpy(node->T.A, cur->T.A, N+1);
         if (!dest.h) dest.h = node;
         else dest.t->next = node;
         dest.t = node;
